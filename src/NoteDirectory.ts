@@ -55,6 +55,15 @@ export class NoteDirectory {
         const notes = (
             readdirSync(dir)
                 .filter(d => d.endsWith(".md"))
+                .sort((x, y) => {
+                    // if x and y both start with a digit
+                    if (x.match(/^\d/) && y.match(/^\d/)) {
+                        // reverse date order
+                        return x < y ? 1 : -1;
+                    }
+                    // just regular alphabetical
+                    return x > y ? 1 : -1;
+                })
         );
         return notes;
     }
