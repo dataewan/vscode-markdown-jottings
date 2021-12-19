@@ -1,6 +1,6 @@
 import { utimesSync, existsSync, closeSync, openSync, readdir, readdirSync } from 'fs';
+import * as path from 'path';
 import { join } from 'path';
-import path = require('path');
 import * as vscode from 'vscode';
 
 export class NoteDirectory {
@@ -60,10 +60,12 @@ export class NoteDirectory {
     }
 
     static existingNoteDialog() {
+        const dir = vscode.workspace.getConfiguration("markdown-jottings").noteDirectory;
         const notes = NoteDirectory.getAllMarkdownNotes();
         const options = notes.map(d => ({
             label: d,
-            description: ""
+            description: "",
+            path: path.join(dir, d),
         }));
 
         const note = vscode.window.showQuickPick(options).then(note => {
@@ -75,11 +77,57 @@ export class NoteDirectory {
     }
 
     static async openNote() {
-        const noteName = await NoteDirectory.existingNoteDialog();
-        if (!noteName) { return; }
+        const note = await NoteDirectory.existingNoteDialog();
+        if (!note) { return; }
+        vscode.window.showTextDocument(vscode.Uri.file(note.path));
+    }
+
+    static isWithinDirectory(filepath: string): boolean {
         const dir = vscode.workspace.getConfiguration("markdown-jottings").noteDirectory;
-        const fullPath = join(dir, noteName.label);
-        vscode.window.showTextDocument(vscode.Uri.file(fullPath));
+        const relative = path.relative(filepath, dir);
+        return relative.startsWith('..') && !path.isAbsolute(relative);
+    }
+
+    static isCurrentlyNote(): boolean {
+        if (!vscode.window.activeTextEditor) { return false; }
+        if (!NoteDirectory.isWithinDirectory(vscode.window.activeTextEditor.document.uri.fsPath)) { return false; }
+        return true;
+    }
+
+    static getNoteLabel(noteLabel: string) {
+        const placeholder = path.basename(noteLabel).replace(".md", "");
+        const options: vscode.InputBoxOptions = {
+            prompt: "Label for link",
+            placeHolder: placeholder,
+        };
+
+        const label = vscode.window.showInputBox(options).then(value => {
+            if (!value) { return placeholder; }
+            return value;
+        });
+
+        return label;
+    }
+
+    static createMdLink(filePath: string, label: string): string {
+        const fullPath = path.join(".", filePath);
+        return `[${label}](${fullPath})`;
+    }
+
+    static async linkNote() {
+        if (!NoteDirectory.isCurrentlyNote()) {
+            vscode.window.showErrorMessage("Current document is not a note");
+            return;
+        }
+
+        const note = await NoteDirectory.existingNoteDialog();
+
+        if (!note) { return; }
+        const label = await NoteDirectory.getNoteLabel(note.label);
+        const link = NoteDirectory.createMdLink(note.label, label);
+
+        const editor = vscode.window.activeTextEditor;
+        editor?.edit(e => e.insert(editor.selection.active, link));
     }
 
 }
