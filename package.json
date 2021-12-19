@@ -19,7 +19,16 @@
         "command": "markdown-jottings.newNote",
         "title": "Jottings: New Note"
       }
-    ]
+    ],
+    "configuration": {
+      "title": "Markdown Jottings Configuration",
+      "properties": {
+        "markdown-jottings.noteDirectory": {
+          "type": "string",
+          "default": "/Users/ewannicolson/Desktop/zettelkasten"
+        }
+      }
+    }
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",
