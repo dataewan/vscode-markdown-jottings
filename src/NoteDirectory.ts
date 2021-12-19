@@ -1,4 +1,5 @@
-import { utimesSync, existsSync, closeSync, openSync } from 'fs';
+import { utimesSync, existsSync, closeSync, openSync, readdir, readdirSync } from 'fs';
+import { join } from 'path';
 import path = require('path');
 import * as vscode from 'vscode';
 
@@ -47,4 +48,38 @@ export class NoteDirectory {
             }
         );
     }
+
+
+    static getAllMarkdownNotes(): string[] {
+        const dir = vscode.workspace.getConfiguration("markdown-jottings").noteDirectory;
+        const notes = (
+            readdirSync(dir)
+                .filter(d => d.endsWith(".md"))
+        );
+        return notes;
+    }
+
+    static existingNoteDialog() {
+        const notes = NoteDirectory.getAllMarkdownNotes();
+        const options = notes.map(d => ({
+            label: d,
+            description: ""
+        }));
+
+        const note = vscode.window.showQuickPick(options).then(note => {
+            if (!note) { return; }
+            return note;
+        });
+
+        return note;
+    }
+
+    static async openNote() {
+        const noteName = await NoteDirectory.existingNoteDialog();
+        if (!noteName) { return; }
+        const dir = vscode.workspace.getConfiguration("markdown-jottings").noteDirectory;
+        const fullPath = join(dir, noteName.label);
+        vscode.window.showTextDocument(vscode.Uri.file(fullPath));
+    }
+
 }
