@@ -2,6 +2,9 @@
   "name": "markdown-jottings",
   "displayName": "markdown-jottings",
   "description": "Take notes in markdown, create links between them",
+  "repository": {
+      "url": "https://github.com/dataewan/vscode-markdown-jottings"
+  },
   "version": "0.0.1",
   "engines": {
     "vscode": "^1.63.0"

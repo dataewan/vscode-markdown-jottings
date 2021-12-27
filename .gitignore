@@ -731,3 +731,5 @@ FodyWeavers.xsd
 
 .vscode/
 .vscodeignore
+
+*vsix
