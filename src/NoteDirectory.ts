@@ -68,6 +68,18 @@ export class NoteDirectory {
         return notes;
     }
 
+    static indexToFilepath(index: string): string {
+        const dir = vscode.workspace.getConfiguration("markdown-jottings").noteDirectory;
+        return join(dir, index);
+    }
+
+    static filePathToIndex(filepath: string): string {
+        const dir = vscode.workspace.getConfiguration("markdown-jottings").noteDirectory;
+        return filepath
+            .replace(dir, "")
+            .replace(/\//g, '');
+    }
+
     static existingNoteDialog() {
         const dir = vscode.workspace.getConfiguration("markdown-jottings").noteDirectory;
         const notes = NoteDirectory.getAllMarkdownNotes();

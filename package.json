@@ -12,7 +12,8 @@
   "activationEvents": [
     "onCommand:markdown-jottings.newNote",
     "onCommand:markdown-jottings.openNote",
-    "onCommand:markdown-jottings.linkNote"
+    "onCommand:markdown-jottings.linkNote",
+    "onCommand:markdown-jottings.getBacklinks"
   ],
   "main": "./out/extension.js",
   "contributes": {
@@ -28,6 +29,10 @@
       {
         "command": "markdown-jottings.linkNote",
         "title": "Jottings: Link Note"
+      },
+      {
+        "command": "markdown-jottings.getBacklinks",
+        "title": "Jottings: Get backlinks"
       }
     ],
     "configuration": {
