@@ -3,7 +3,7 @@
   "displayName": "markdown-jottings",
   "description": "Take notes in markdown, create links between them",
   "repository": {
-      "url": "https://github.com/dataewan/vscode-markdown-jottings"
+    "url": "https://github.com/dataewan/vscode-markdown-jottings"
   },
   "version": "0.0.1",
   "engines": {
@@ -16,6 +16,7 @@
     "onCommand:markdown-jottings.newNote",
     "onCommand:markdown-jottings.openNote",
     "onCommand:markdown-jottings.linkNote",
+    "onCommand:markdown-jottings.linkNewNote",
     "onCommand:markdown-jottings.getBacklinks"
   ],
   "main": "./out/extension.js",
@@ -31,7 +32,11 @@
       },
       {
         "command": "markdown-jottings.linkNote",
-        "title": "Jottings: Link Note"
+        "title": "Jottings: Link to existing Note"
+      },
+      {
+        "command": "markdown-jottings.linkNewNote",
+        "title": "Jottings: Link to new Note"
       },
       {
         "command": "markdown-jottings.getBacklinks",
