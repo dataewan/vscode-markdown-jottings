@@ -25,7 +25,7 @@ export class NoteDirectory {
         }
     }
 
-    static createNewNote(noteName: string) {
+    static createNewNote(noteName: string): string | undefined {
         const dir = vscode.workspace.getConfiguration("markdown-jottings").noteDirectory;
         const dirExists = existsSync(dir);
         if (!dirExists) {
@@ -37,6 +37,7 @@ export class NoteDirectory {
 
         NoteDirectory.touchFile(newFilename);
         vscode.window.showTextDocument(vscode.Uri.file(newFilename));
+        return newFilename;
     }
 
     static newNote(context: vscode.ExtensionContext) {
@@ -69,11 +70,14 @@ export class NoteDirectory {
     }
 
     static indexToFilepath(index: string): string {
+        /* Converts a relative path to an absolute path */
         const dir = vscode.workspace.getConfiguration("markdown-jottings").noteDirectory;
         return join(dir, index);
     }
 
     static filePathToIndex(filepath: string): string {
+        /* Converts the absolute path to a relative path
+         */
         const dir = vscode.workspace.getConfiguration("markdown-jottings").noteDirectory;
         return filepath
             .replace(dir, "")
@@ -135,6 +139,12 @@ export class NoteDirectory {
         return `[${label}](${fullPath})`;
     }
 
+    static insertLink(notePath: string, noteLabel: string) {
+        const link = NoteDirectory.createMdLink(notePath, noteLabel);
+        const editor = vscode.window.activeTextEditor;
+        editor?.edit(e => e.insert(editor.selection.active, link));
+    }
+
     static async linkNote() {
         if (!NoteDirectory.isCurrentlyNote()) {
             vscode.window.showErrorMessage("Current document is not a note");
@@ -145,10 +155,24 @@ export class NoteDirectory {
 
         if (!note) { return; }
         const label = await NoteDirectory.getNoteLabel(note.label);
-        const link = NoteDirectory.createMdLink(note.label, label);
-
-        const editor = vscode.window.activeTextEditor;
-        editor?.edit(e => e.insert(editor.selection.active, link));
+        NoteDirectory.insertLink(note.label, label)
     }
 
+    static async linkNewNote() {
+        if (!NoteDirectory.isCurrentlyNote()) {
+            vscode.window.showErrorMessage("Current document is not a note");
+            return;
+        }
+        const noteName = await NoteDirectory.newNotePrompt();
+
+        if (!noteName) { return; }
+
+        const label = await NoteDirectory.getNoteLabel(noteName);
+
+        const noteFilename = NoteDirectory.createNewNote(noteName);
+        if (noteFilename) {
+            const index = NoteDirectory.filePathToIndex(noteFilename);
+            NoteDirectory.insertLink(index, label);
+        }
+    }
 }

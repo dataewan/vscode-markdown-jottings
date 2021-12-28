@@ -12,6 +12,9 @@ export function activate(context: vscode.ExtensionContext) {
 	let linkNoteDisposable = vscode.commands.registerCommand('markdown-jottings.linkNote', NoteDirectory.linkNote);
 	context.subscriptions.push(linkNoteDisposable);
 
+	let linkNewNoteDisposable = vscode.commands.registerCommand('markdown-jottings.linkNewNote', NoteDirectory.linkNewNote);
+	context.subscriptions.push(linkNewNoteDisposable);
+
 	let backlinkDisposable = vscode.commands.registerCommand('markdown-jottings.getBacklinks', MarkdownParser.getBacklinks);
 	context.subscriptions.push(backlinkDisposable);
 
